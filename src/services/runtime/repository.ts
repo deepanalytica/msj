@@ -269,13 +269,20 @@ export async function workspaceCanUseAI(workspaceId: string) {
   const month = new Date().toISOString().slice(0, 7) + "-01";
   const [{ data: workspace }, { data: subscription }, { data: usage }] = await Promise.all([
     db.from("workspace").select("status").eq("id", workspaceId).single(),
-    db.from("workspace_subscription").select("plan_code,status").eq("workspace_id", workspaceId).maybeSingle(),
+    db.from("workspace_subscription").select("plan_code,status,trial_ends_at").eq("workspace_id", workspaceId).maybeSingle(),
     db.from("usage_monthly").select("ai_replies").eq("workspace_id", workspaceId).eq("month", month).maybeSingle(),
   ]);
 
   if (workspace?.status !== "active") return { allowed: false, reason: "workspace_inactive" };
   if (subscription && !["trialing","active"].includes(subscription.status)) {
     return { allowed: false, reason: "subscription_inactive" };
+  }
+  if (
+    subscription?.status === "trialing" &&
+    subscription.trial_ends_at &&
+    new Date(subscription.trial_ends_at).getTime() < Date.now()
+  ) {
+    return { allowed: false, reason: "trial_expired" };
   }
 
   const planCode = subscription?.plan_code ?? "starter";
