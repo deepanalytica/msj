@@ -64,6 +64,15 @@ export async function POST(request: Request) {
     trial_ends_at: new Date(Date.now() + 14 * 86400000).toISOString(),
   });
 
+  await admin.from("assistant_profile").insert({
+    workspace_id: workspace.id,
+    name: "Asistente",
+    enabled: false,
+    model: process.env.OPENAI_MODEL || "gpt-5.6-luna",
+    system_prompt: "",
+    max_history_messages: 12,
+  });
+
   await admin.from("audit_event").insert({
     workspace_id: workspace.id,
     actor_user_id: user.id,
