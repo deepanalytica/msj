@@ -280,9 +280,9 @@ export async function workspaceCanUseAI(workspaceId: string) {
 
   const planCode = subscription?.plan_code ?? "starter";
   const limits: Record<string, number | null> = {
-    starter: 5000,
-    growth: 25000,
-    scale: 100000,
+    starter: 3000,
+    growth: 15000,
+    scale: 60000,
     enterprise: null,
   };
   const limit = limits[planCode] ?? 5000;
