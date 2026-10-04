@@ -25,6 +25,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Sin permiso." }, { status: 403 });
   }
 
+  const { data: workspace } = await admin.from("workspace")
+    .select("status")
+    .eq("id", membership.workspace_id)
+    .single();
+  if (workspace?.status !== "active") {
+    return NextResponse.json({ error: "El workspace está suspendido o cerrado." }, { status: 403 });
+  }
+
   const { data: conversation } = await admin.from("conversation")
     .select("id,contact_id,channel_connection_id")
     .eq("workspace_id", membership.workspace_id)
