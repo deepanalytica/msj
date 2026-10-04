@@ -57,8 +57,8 @@ See `docs/SECURITY.md`.
 ## Commercial plans
 
 - Starter — USD 29/month
-- Growth — USD 69/month
-- Scale — USD 149/month
+- Growth — USD 79/month
+- Scale — USD 179/month
 - Enterprise — custom
 
 Meta/WhatsApp transport fees stay on the customer's own Meta account whenever possible.
