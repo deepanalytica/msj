@@ -1,0 +1,74 @@
+name: Cloudflare Meta Gateway
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "workers/meta-gateway/**"
+      - ".github/workflows/cloudflare-meta-gateway.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: msj-meta-gateway
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: workers/meta-gateway
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate credentials
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || (echo "::error::Missing CLOUDFLARE_API_TOKEN" && exit 1)
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "::error::Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Ensure queue exists
+        working-directory: .
+        run: npx --yes wrangler@latest queues create msj-meta-events || true
+
+      - name: Write gateway secrets
+        shell: bash
+        env:
+          META_VERIFY_TOKEN: ${{ secrets.META_VERIFY_TOKEN }}
+          META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+          MSJ_INTERNAL_SECRET: ${{ secrets.MSJ_INTERNAL_SECRET }}
+          MSJ_EVENTS_URL: ${{ vars.MSJ_EVENTS_URL || secrets.MSJ_EVENTS_URL }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const names = ['META_VERIFY_TOKEN','META_APP_SECRET','MSJ_INTERNAL_SECRET','MSJ_EVENTS_URL'];
+          const missing = names.filter((n) => !process.env[n]);
+          if (missing.length) {
+            console.error('Missing gateway secrets: ' + missing.join(', '));
+            process.exit(1);
+          }
+          const out = Object.fromEntries(names.map((n) => [n, process.env[n]]));
+          fs.writeFileSync('.gateway-secrets.json', JSON.stringify(out), {mode:0o600});
+          NODE
+
+      - name: Deploy gateway
+        run: npx wrangler deploy --secrets-file .gateway-secrets.json
+
+      - name: Cleanup
+        if: always()
+        run: rm -f .gateway-secrets.json
