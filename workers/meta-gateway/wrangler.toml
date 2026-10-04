@@ -1,0 +1,13 @@
+name = "msj-meta-gateway"
+main = "src/index.mjs"
+compatibility_date = "2026-10-03"
+
+[[queues.producers]]
+binding = "META_EVENTS"
+queue = "msj-meta-events"
+
+[[queues.consumers]]
+queue = "msj-meta-events"
+max_batch_size = 10
+max_batch_timeout = 2
+max_retries = 5
