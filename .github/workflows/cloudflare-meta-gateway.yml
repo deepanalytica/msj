@@ -46,5 +46,29 @@ jobs:
         working-directory: .
         run: npx --yes wrangler@latest queues create msj-meta-events || true
 
+      - name: Write gateway secrets
+        shell: bash
+        env:
+          META_VERIFY_TOKEN: ${{ secrets.META_VERIFY_TOKEN }}
+          META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+          MSJ_INTERNAL_SECRET: ${{ secrets.MSJ_INTERNAL_SECRET }}
+          MSJ_EVENTS_URL: ${{ vars.MSJ_EVENTS_URL || secrets.MSJ_EVENTS_URL }}
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const names = ['META_VERIFY_TOKEN','META_APP_SECRET','MSJ_INTERNAL_SECRET','MSJ_EVENTS_URL'];
+          const missing = names.filter((n) => !process.env[n]);
+          if (missing.length) {
+            console.error('Missing gateway secrets: ' + missing.join(', '));
+            process.exit(1);
+          }
+          const out = Object.fromEntries(names.map((n) => [n, process.env[n]]));
+          fs.writeFileSync('.gateway-secrets.json', JSON.stringify(out), {mode:0o600});
+          NODE
+
       - name: Deploy gateway
-        run: npx wrangler deploy
+        run: npx wrangler deploy --secrets-file .gateway-secrets.json
+
+      - name: Cleanup
+        if: always()
+        run: rm -f .gateway-secrets.json
