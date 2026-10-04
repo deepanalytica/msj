@@ -90,14 +90,14 @@ export function AppConsole() {
         <a href="/" className="product-brand"><span>M</span><strong>MSJ</strong></a>
         <div className="workspace-chip"><small>WORKSPACE</small><strong>{summary.workspace.name}</strong><span>{summary.plan.toUpperCase()}</span></div>
         <nav>
-          <a className="active"><Activity size={17}/> Operación</a>
-          <a><MessagesSquare size={17}/> Conversaciones</a>
-          <a><Cable size={17}/> Canales</a>
-          <a><Bot size={17}/> Asistente</a>
-          <a><PlugZap size={17}/> Integraciones</a>
-          <a><Users size={17}/> Equipo</a>
-          <a><ShieldCheck size={17}/> Auditoría</a>
-          <a><Settings size={17}/> Configuración</a>
+          <a className="active" href="/app"><Activity size={17}/> Operación</a>
+          <a href="/app/conversations"><MessagesSquare size={17}/> Conversaciones</a>
+          <a href="/app/setup"><Cable size={17}/> Canales</a>
+          <a href="/app/setup"><Bot size={17}/> Asistente</a>
+          <a href="/app/setup"><PlugZap size={17}/> Integraciones</a>
+          <a href="/app/setup"><Users size={17}/> Equipo</a>
+          <a href="/app/conversations"><ShieldCheck size={17}/> Auditoría</a>
+          <a href="/app/setup"><Settings size={17}/> Configuración</a>
         </nav>
         <button className="sidebar-logout" onClick={()=>void signOut()}><LogOut size={15}/> Salir</button>
       </aside>
