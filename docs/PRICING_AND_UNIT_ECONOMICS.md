@@ -15,9 +15,9 @@ This keeps:
 
 | Plan | Monthly | Active contacts | AI replies | Seats | Channels | Integrations |
 |---|---:|---:|---:|---:|---:|---:|
-| Starter | USD 29 | 2,000 | 5,000 | 2 | 1 | 1 |
-| Growth | USD 69 | 10,000 | 25,000 | 5 | 3 | 5 |
-| Scale | USD 149 | 50,000 | 100,000 | 15 | 10 | 20 |
+| Starter | USD 29 | 2,000 | 3,000 | 2 | 1 | 1 |
+| Growth | USD 79 | 10,000 | 15,000 | 5 | 3 | 5 |
+| Scale | USD 179 | 50,000 | 60,000 | 15 | 10 | 20 |
 | Enterprise | custom | custom | custom | custom | custom | custom |
 
 Suggested AI overage:
