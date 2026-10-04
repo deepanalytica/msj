@@ -11,6 +11,7 @@ async function post(url: string, accessToken: string, body: JsonRecord): Promise
     method: "POST",
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10000),
     cache: "no-store",
   });
   const json = await response.json().catch(()=>({})) as JsonRecord;
